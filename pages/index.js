@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { fetchPluginInfo, fetchWordPressVersion } from './libs/requests';
+import { fetchPluginInfo, fetchWordPressVersion } from '../libs/requests';
 import { decode } from 'html-entities';
 import { PluginCard } from '../components/PluginCard';
 

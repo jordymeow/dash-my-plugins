@@ -1,11 +1,8 @@
 import compareVersions from 'compare-versions';
 import Image from 'next/image';
-import { Icon, InlineIcon } from '@iconify/react';
+import { Icon } from '@iconify/react';
 import alertIcon from '@iconify/icons-mdi/alert';
-import alarmIcon from '@iconify/icons-mdi/alarm-check';
-import checkCircleIcon from '@iconify/icons-mdi/check-circle';
 import accountCircle from '@iconify/icons-mdi/account-circle';
-
 
 import ago from 's-ago';
 import css from '../styles/Card.module.css'
