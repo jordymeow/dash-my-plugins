@@ -1,0 +1,71 @@
+:root {
+  --blue: #507ebb;
+  --indigo: #727cf5;
+  --purple: #6b5eae;
+  --pink: #ff679b;
+  --red: #e63757;
+  --orange: orange;
+  --yellow: #f5803e;
+  --green: rgb(66, 165, 51);
+  --teal: #02a8b5;
+  --cyan: #27bcfd;
+  --white: #fff;
+  --gray: #748194;
+  --gray-dark: #4d5969;
+  --primary: #2c7be5;
+  --secondary: #748194;
+  --success: #00d27a;
+  --info: #27bcfd;
+  --warning: #f5803e;
+  --danger: #e63757;
+  --light: #f9fafd;
+  --dark: #0b1727;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 40px;
+  font-size: 12px;
+  background-color: #edf2f9;
+  font-family: "Open Sans";
+  color: #5e6e82;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1 {
+  font-family: Poppins;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--blue);
+}
+
+p {
+  font-size: 15px;
+  color: var(--gray);
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}
+
+.page {
+  margin-top: 80px;
+  display: grid;
+  grid-template-columns: repeat( auto-fit, minmax(580px, 1fr) );
+}
