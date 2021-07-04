@@ -8,6 +8,18 @@ const fetchPluginInfo = async (slug) => {
   return json;
 }
 
+const fetchActiveStats = async (slug) => {
+  const res = await fetch(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
+  const json = await res.json();
+  return json;
+}
+
+const fetchDownloadsStats = async (slug) => {
+  const res = await fetch(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
+  const json = await res.json();
+  return json;
+}
+
 const fetchWordPressVersion = async () => {
   const res = await fetch(`${WP_API}/core/stable-check/1.0/`);
   const data = await res.json();
@@ -20,4 +32,4 @@ const fetchWordPressVersion = async () => {
   return null;
 }
 
-export { fetchPluginInfo, fetchWordPressVersion };
+export { fetchPluginInfo, fetchWordPressVersion, fetchActiveStats, fetchDownloadsStats };

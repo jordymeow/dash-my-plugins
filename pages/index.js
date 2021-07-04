@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { fetchPluginInfo, fetchWordPressVersion } from '../libs/requests';
+import { fetchActiveStats, fetchDownloadsStats, fetchPluginInfo, fetchWordPressVersion } from '../libs/requests';
 import { decode } from 'html-entities';
 import { PluginCard } from '../components/PluginCard';
 
@@ -33,6 +33,8 @@ export async function getStaticProps() {
   const wpVersion = await fetchWordPressVersion();
   for (let cfgPlugin of cfgPlugins) {
     const data = await fetchPluginInfo(cfgPlugin);
+    const downloads = await fetchDownloadsStats(cfgPlugin);
+    const activeInstalls = await fetchActiveStats(cfgPlugin);
     
     if (data.slug) {
       let { name, slug, version, tested, rating, num_ratings, ratings, tags, screenshots, banners,
@@ -52,7 +54,9 @@ export async function getStaticProps() {
         num_ratings: parseInt(num_ratings),
         support_threads: parseInt(support_threads) - parseInt(support_threads_resolved),
         active_installs: parseInt(active_installs),
-        last_updated
+        last_updated,
+        downloads,
+        activeInstalls
       });
     }
     else {
