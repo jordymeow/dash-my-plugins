@@ -89,5 +89,6 @@ export async function getStaticProps() {
       console.log(`No data for ${cfgPlugin}.`);
     }
   }
+  plugins.sort((a, b) => (a.slackScore > b.slackScore) ? -1 : 1);
   return { props: { plugins, wpVersion }, revalidate: 60 * 1 }
 }

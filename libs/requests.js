@@ -5,8 +5,8 @@ const WP_API = 'https://api.wordpress.org';
 // https://api.wordpress.org/stats/plugin/1.0/downloads.php?slug={media-cleaner}
 
 const dataAggregateForDownloads = (data, aggregateBy = 'month') => {
-	if (data.length < 90)
-		return data;
+	// if (data.length < 90)
+	// 	return data;
 	data.forEach(x => { x.date = DayJS(x.date).endOf(aggregateBy).toISOString() });
 	var newData = [];
 	data.reduce((res, value) => {
@@ -21,8 +21,8 @@ const dataAggregateForDownloads = (data, aggregateBy = 'month') => {
 }
 
 const dataAggregateForInstalls = (data, aggregateBy = 'month') => {
-	if (data.length < 90)
-		return data;
+	// if (data.length < 90)
+	// 	return data;
 	data.forEach(x => { x.date = DayJS(x.date).endOf(aggregateBy).toISOString() });
 	var newData = [];
 	data.reduce((res, value) => {
