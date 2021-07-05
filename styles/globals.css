@@ -3,7 +3,7 @@
   --indigo: #727cf5;
   --purple: #6b5eae;
   --pink: #ff679b;
-  --red: #e63757;
+  --red: #ea5747;
   --orange: orange;
   --yellow: #f5803e;
   --green: rgb(66, 165, 51);
@@ -16,8 +16,6 @@
   --secondary: #748194;
   --success: #00d27a;
   --info: #27bcfd;
-  --warning: #f5803e;
-  --danger: #e63757;
   --light: #f9fafd;
   --dark: #0b1727;
 }

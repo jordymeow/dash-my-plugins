@@ -1,7 +1,15 @@
-import Head from 'next/head'
+import Head from 'next/head';
+import compareVersions from 'compare-versions';
+import ago from 's-ago';
 import { fetchActiveStats, fetchDownloadsStats, fetchPluginInfo, fetchWordPressVersion } from '../libs/requests';
 import { decode } from 'html-entities';
 import { PluginCard } from '../components/PluginCard';
+import DayJS from 'dayjs';
+var customParseFormat = require('dayjs/plugin/customParseFormat');
+DayJS.extend(customParseFormat)
+
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const ONE_WEEK = ONE_DAY * 7;
 
 export default function Home(props) {
   const { plugins = [], wpVersion } = props;
@@ -35,28 +43,46 @@ export async function getStaticProps() {
     const data = await fetchPluginInfo(cfgPlugin);
     const downloads = await fetchDownloadsStats(cfgPlugin);
     const activeInstalls = await fetchActiveStats(cfgPlugin);
-    
+
     if (data.slug) {
       let { name, slug, version, tested, rating, num_ratings, ratings, tags, screenshots, banners,
         support_threads, support_threads_resolved, active_installs, last_updated } = data;
-      last_updated = last_updated?.split(' ')[0];
-      last_updated = last_updated ? (new Date(last_updated)).toString() : null;
+      last_updated = DayJS(last_updated.replace(' GMT', ''), 'YYYY-MM-DD h:mma').toDate().toString();
+      const lastUpdated = new Date(last_updated);
+      lastUpdated.setMinutes(lastUpdated.getMinutes() + lastUpdated.getTimezoneOffset() * -1);
+      const msSinceRelease = (new Date() - lastUpdated);
+      const pendingSupport = parseInt(support_threads) - parseInt(support_threads_resolved);
+
+      const supportSlackScore = pendingSupport > 5 ? 2 : pendingSupport > 0 ? 1 : 0;
+      const versionSlackScore = msSinceRelease > (ONE_WEEK * 4) ? 2 : (msSinceRelease > (ONE_WEEK * 2) ? 1 : 0);
+      const testedSlackScore = !!compareVersions(wpVersion, data.tested.toString()) ? 2 : 0;
+      const ratingSlackScore = rating > 92 ? 0 : (rating > 90 ? 1 : 2);
+
       plugins.push({
         name: decode(name),
         slug,
         tags,
         screenshots,
         banners,
-        version: parseFloat(version),
-        tested: parseFloat(tested),
+        version: version,
+        tested: tested,
         rating: parseInt(rating),
         ratings,
         num_ratings: parseInt(num_ratings),
-        support_threads: parseInt(support_threads) - parseInt(support_threads_resolved),
+        support_threads: pendingSupport,
         active_installs: parseInt(active_installs),
-        last_updated,
         downloads,
-        activeInstalls
+        activeInstalls,
+
+        readableTime: ago(lastUpdated),
+
+        versionSlackScore,
+        testedSlackScore,
+        ratingSlackScore,
+        supportSlackScore,
+
+        slackScore: supportSlackScore + versionSlackScore + testedSlackScore + ratingSlackScore
+
       });
     }
     else {

@@ -1,118 +1,86 @@
-import compareVersions from 'compare-versions';
 import Image from 'next/image';
 import DayJS from 'dayjs';
 import { Icon } from '@iconify/react';
 import alertIcon from '@iconify/icons-mdi/alert';
+import alertOctagon from '@iconify/icons-mdi/alert-octagon';
 import accountCircle from '@iconify/icons-mdi/account-circle';
+import closeCircle from '@iconify/icons-mdi/bomb';
 import { ResponsiveContainer, ReferenceLine, ComposedChart, Bar, Line, XAxis, YAxis, Tooltip } from 'recharts';
 
-import ago from 's-ago';
 import css from '../styles/Card.module.css'
 
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-const dataAggregateForDownloads = (data, aggregateBy = 'month') => {
-	if (data.length < 90)
-		return data;
-	data.forEach(x => { x.date = DayJS(x.date).endOf(aggregateBy).toISOString() });
-	var newData = [];
-	data.reduce((res, value) => {
-		if (!res[value.date]) {
-			res[value.date] = { date: value.date, value: value.value };
-			newData.push(res[value.date])
-		}
-		res[value.date].value += value.value;
-		return res;
-	}, {});
-	return newData;
-}
-
-const dataAggregateForInstalls = (data, aggregateBy = 'month') => {
-	if (data.length < 90)
-		return data;
-	data.forEach(x => { x.date = DayJS(x.date).endOf(aggregateBy).toISOString() });
-	var newData = [];
-	data.reduce((res, value) => {
-    let realValue = parseFloat(value.value);
-		if (!res[value.date]) {
-			res[value.date] = { date: value.date, value: 0 };
-			newData.push(res[value.date])
-		}
-		res[value.date].value += realValue;
-		return res;
-	}, {});
-	return newData;
-}
-
 const PluginCard = ({ data, wpVersion }) => {
-  const readableTime = ago(new Date(data.last_updated));
-  const isOutdated = compareVersions(wpVersion, data.tested.toString());
-  const needsPush = (new Date() - new Date(data.last_updated)) > (1000 * 60 * 60 * 24 * 7 * 3);
-
-  let chartsDownloadsData = [];
-  for (const date of Object.keys(data.downloads))
-    chartsDownloadsData.push({ date: new Date(date), value: parseInt(data.downloads[date]) });
-  chartsDownloadsData = dataAggregateForDownloads(chartsDownloadsData);
-
-  let chartsInstallsData = [];
-  for (const date of Object.keys(data.activeInstalls))
-    chartsInstallsData.push({ date: new Date(date), value: data.activeInstalls[date] });
-  chartsInstallsData = dataAggregateForInstalls(chartsInstallsData);
-
   const finalData = [];
-  for (let c = 0; c < chartsDownloadsData.length; c++) {
+  for (let c = 0; c < data.downloads.length; c++) {
     finalData.push({
-      date: chartsDownloadsData[c].date,
-      downloads: chartsDownloadsData[c].value,
-      installsGrowth: chartsInstallsData[c].value,
+      date: data.downloads[c].date,
+      downloads: data.downloads[c].value,
+      installsGrowth: data.activeInstalls[c].value,
     });
+  }
+
+  const slackClass = (score) => {
+    return score === 1 ? css.orangeFont : score === 2 ? css.redFont : css.greenFont;
+  }
+
+  const slackIcon = (score) => {
+    return <>
+      {score === 1 && <Icon icon={alertIcon} style={{ marginLeft: 3 }} color={'var(--orange)'} />}
+      {score === 2 && <Icon icon={alertOctagon} style={{ marginLeft: 3 }} color={'var(--red)'} />}
+    </>;
   }
 
   return (<div key={data.slug} className={css.card}>
     <div className={css.banner}><Image src={data.banners.high} layout='fill' alt={data.slug} /></div>
-    <h2 className={css.cardTitle}>
-      {data.name}
+    <a className={css.cardTitle} title={`Slack Score: ${data.slackScore}`} 
+      href={`https://wordpress.org/plugins/${data.slug}/`} rel="noreferrer" target="_blank">
+      <h2>
+        {data.slackScore >= 6 && <Icon icon={closeCircle} width={19}
+          style={{ position: 'relative', top: 3, marginRight: 5 }} color={'var(--red)'} />}
+        {(data.slackScore >= 2 && data.slackScore < 6) && <Icon icon={closeCircle} width={19}
+          style={{ position: 'relative', top: 3, marginRight: 5 }} color={'var(--orange)'} />}
+        {data.name}
+      </h2>
       <small>
         {numberWithCommas(data.active_installs)}
         <Icon icon={accountCircle} width={18} style={{ position: 'relative', top: 4, marginLeft: 4, marginTop: 0 }} /> 
       </small>
-    </h2>
+    </a>
     <div className={css.content}>
       
       <div className={css.attributes}>
 
         <div className={css.attribute}>
-          <div className={needsPush ? css.redFont : ''}>{data.version}
-            {needsPush && <Icon icon={alertIcon} color={'orange'} />}</div>
-          <small>{readableTime}</small>
+          <div className={slackClass(data.versionSlackScore)}>{data.version}{slackIcon(data.versionSlackScore)}</div>
+          <small>{data.readableTime}</small>
         </div>
 
         <div className={css.attribute}>
-          <div className={isOutdated ? css.redFont : ''}>{data.tested}
-            {isOutdated && <Icon icon={alertIcon} color={'orange'} />}
-          </div>
+          <div className={slackClass(data.testedSlackScore)}>{data.tested}{slackIcon(data.testedSlackScore)}</div>
           <small>WordPress</small>
         </div>
 
         <div className={css.attribute}>
           <a href={`https://wordpress.org/support/plugin/${data.slug}/`} rel="noreferrer" target="_blank">
-            <div className={data.support_threads ? css.redFont : css.greenFont}>
-              {!data.support_threads ? '0' : data.support_threads}
-              {!!data.support_threads && <Icon icon={alertIcon} color={'orange'} />}
+            <div className={slackClass(data.supportSlackScore)}>
+              {!data.support_threads ? '0' : data.support_threads}{slackIcon(data.supportSlackScore)}
             </div>
           </a>
           <small>Support</small>
         </div>
 
         <div className={css.attribute}>
-          <a href={`https://wordpress.org/support/plugin/media-cleaner/${data.slug}/reviews/`} rel="noreferrer" target="_blank">
-            <div className={data.rating > 90 ? css.greenFont : css.redFont}>{data.rating}
+          <a href={`https://wordpress.org/support/plugin/${data.slug}/reviews/`} rel="noreferrer" target="_blank">
+            <div className={slackClass(data.ratingSlackScore)}>
+              {data.rating}
               <small style={{ color: '#d2d2d2' }}> / 100</small>
             </div>
           </a>
-          <small>Score</small>
+          <small>Rating</small>
         </div>
 
       </div>
