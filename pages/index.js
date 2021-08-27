@@ -54,7 +54,7 @@ export async function getStaticProps() {
       const pendingSupport = parseInt(support_threads) - parseInt(support_threads_resolved);
 
       const supportSlackScore = pendingSupport > 5 ? 2 : pendingSupport > 0 ? 1 : 0;
-      const versionSlackScore = msSinceRelease > (ONE_WEEK * 4) ? 2 : (msSinceRelease > (ONE_WEEK * 2) ? 1 : 0);
+      const versionSlackScore = msSinceRelease > (ONE_WEEK * 8) ? 2 : (msSinceRelease > (ONE_WEEK * 4) ? 1 : 0);
       const testedSlackScore = !!compareVersions(wpVersion, data.tested.toString()) ? 2 : 0;
       const ratingSlackScore = rating > 92 ? 0 : (rating > 90 ? 1 : 2);
 
