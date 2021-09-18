@@ -38,29 +38,44 @@ const dataAggregateForInstalls = (data, aggregateBy = 'month') => {
 }
 
 const fetchPluginInfo = async (slug) => {
-  const res = await fetch(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${slug}`);
-  const json = await res.json();
-  return json;
+  try {
+    const res = await fetch(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${slug}`);
+    const json = await res.json();
+    return json;
+  }
+  catch (err) {
+    return null;
+  }
 }
 
 const fetchActiveStats = async (slug) => {
-  const res = await fetch(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
-  const json = await res.json();
-  let chartsInstallsData = [];
-  for (const date of Object.keys(json))
-    chartsInstallsData.push({ date: new Date(date), value: json[date] });
-  chartsInstallsData = dataAggregateForInstalls(chartsInstallsData);
-  return chartsInstallsData;
+  try {
+    const res = await fetch(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
+    const json = await res.json();
+    let chartsInstallsData = [];
+    for (const date of Object.keys(json))
+      chartsInstallsData.push({ date: new Date(date), value: json[date] });
+    chartsInstallsData = dataAggregateForInstalls(chartsInstallsData);
+    return chartsInstallsData;
+  }
+  catch (err) {
+    return null;
+  }
 }
 
 const fetchDownloadsStats = async (slug) => {
-  const res = await fetch(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
-  const json = await res.json();
-  let chartsDownloadsData = [];
-  for (const date of Object.keys(json))
-    chartsDownloadsData.push({ date: new Date(date), value: parseInt(json[date]) });
-  chartsDownloadsData = dataAggregateForDownloads(chartsDownloadsData);
-  return chartsDownloadsData;
+  try {
+    const res = await fetch(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
+    const json = await res.json();
+    let chartsDownloadsData = [];
+    for (const date of Object.keys(json))
+      chartsDownloadsData.push({ date: new Date(date), value: parseInt(json[date]) });
+    chartsDownloadsData = dataAggregateForDownloads(chartsDownloadsData);
+    return chartsDownloadsData;
+  }
+  catch (err) {
+    return null;
+  }
 }
 
 const fetchWordPressVersion = async () => {

@@ -44,7 +44,7 @@ export async function getStaticProps() {
     const downloads = await fetchDownloadsStats(cfgPlugin);
     const activeInstalls = await fetchActiveStats(cfgPlugin);
 
-    if (data.slug) {
+    if (data?.slug) {
       let { name, slug, version, tested, rating, num_ratings, ratings, tags, screenshots, banners,
         support_threads, support_threads_resolved, active_installs, last_updated } = data;
       last_updated = DayJS(last_updated.replace(' GMT', ''), 'YYYY-MM-DD h:mma').toDate().toString();

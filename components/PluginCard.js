@@ -17,9 +17,9 @@ const PluginCard = ({ data, wpVersion }) => {
   const finalData = [];
   for (let c = 0; c < data.downloads.length; c++) {
     finalData.push({
-      date: data.downloads[c].date,
-      downloads: data.downloads[c].value,
-      installsGrowth: data.activeInstalls[c]?.value,
+      date: data?.downloads[c].date,
+      downloads: data?.downloads[c].value,
+      installsGrowth: data?.activeInstalls ? data?.activeInstalls[c]?.value : null,
     });
   }
 
