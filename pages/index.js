@@ -40,7 +40,7 @@ export async function getStaticProps() {
   let plugins = [];
   const wpVersion = await fetchWordPressVersion();
   for (let cfgPlugin of cfgPlugins) {
-    const data = await fetchPluginInfo(cfgPlugin);
+    const data = await fetchPluginInfo(cfgPlugin.trim());
     const downloads = await fetchDownloadsStats(cfgPlugin);
     const activeInstalls = await fetchActiveStats(cfgPlugin);
 
