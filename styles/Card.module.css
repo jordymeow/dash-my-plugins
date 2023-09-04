@@ -22,9 +22,7 @@
 }
 
 .banner img {
-  width: 20px;
   overflow: hidden;
-  height: 20px;
   object-fit: cover;
 }
 

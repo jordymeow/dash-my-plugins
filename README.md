@@ -4,7 +4,7 @@ A very simple dashboard which displays information about defined WordPress plugi
 
 ## Installation
 
-It requires [Node.js](https://nodejs.org/) v12+ to run.
+It requires [Node.js](https://nodejs.org/) v18+ to run.
 
 Install the dependencies, create an .env.local file containing a PLUGIN variable with the slugs of your plugins, and start the server.
 

@@ -37,7 +37,7 @@ const PluginCard = ({ data, wpVersion }) => {
   //console.log(data.banners.high);
 
   return (<div key={data.slug} className={css.card}>
-    <div className={css.banner}><Image src={data.banners.high} layout='fill' alt={data.slug} /></div>
+    <div className={css.banner}><Image src={data.banners.high} alt={data.slug} width={280} height={240} /></div>
     <a className={css.cardTitle} title={`Slack Score: ${data.slackScore}`} 
       href={`https://wordpress.org/plugins/${data.slug}/`} rel="noreferrer" target="_blank">
       <h2>
