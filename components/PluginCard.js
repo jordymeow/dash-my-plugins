@@ -129,7 +129,7 @@ const PluginCard = ({ data, wpVersion }) => {
                   if (value && value.toFixed) {
                     const color = value >= 0 ? 'var(--green)' : 'var(--red)';
                     return [
-                      <span style={{ color }}>{value >= 0 ? '+' : ''}{value.toFixed(2)}%</span>,
+                      <span key="growth" style={{ color }}>{value >= 0 ? '+' : ''}{value.toFixed(2)}%</span>,
                       "Growth"
                     ];
                   }
