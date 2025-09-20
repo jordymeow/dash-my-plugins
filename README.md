@@ -56,5 +56,6 @@ docker run -p 3000:3000 --env-file .env dash-my-plugins
 
 ## Environment Variables
 
+- `SITE_NAME` - Custom name for your dashboard (default: Dash My Plugins)
 - `PLUGINS` - Comma-separated list of WordPress plugin slugs to track
 - `PORT` - Server port (default: 3000)

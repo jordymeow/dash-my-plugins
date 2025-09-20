@@ -87,32 +87,55 @@ const PluginCard = ({ data, wpVersion }) => {
 
       </div>
 
-      <div style={{ display: 'flex', height: 90, width: '100%', marginTop: 10, marginBottom: -10 }}>
+      <div style={{ display: 'flex', height: 100, width: '100%', marginTop: 15, marginBottom: -15 }}>
         <ResponsiveContainer>
-          <ComposedChart data={finalData} margin={0} padding={0}>
+          <ComposedChart data={finalData} margin={{ top: 10, right: 0, bottom: 0, left: 0 }}>
             <defs>
-              <linearGradient id="downloadsGradient" x1="0" y1="0" x2="0" y2="100%" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stopColor="var(--blue)" />
-                <stop offset="0.5" stopColor="#c3ddff" />
-                <stop offset="1" stopColor="#c3ddff" />
+              <linearGradient id={`downloadsGradient-${data.slug}`} x1="0" y1="0" x2="0" y2="100%" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="var(--blue)" stopOpacity={0.8} />
+                <stop offset="0.95" stopColor="var(--blue)" stopOpacity={0.1} />
+              </linearGradient>
+              <linearGradient id={`installsGradient-${data.slug}`} x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="var(--purple)" stopOpacity={0.8} />
+                <stop offset="1" stopColor="var(--orange)" stopOpacity={0.8} />
               </linearGradient>
             </defs>
             <Bar dataKey="downloads" yAxisId="yDownloads"
-              fill="url(#downloadsGradient)" strokeWidth={0} isAnimationActive={false} />
-            <Line dataKey="installsGrowth" yAxisId="yInstallsGrowth" stroke="orange" strokeWidth={2} dot={false} />
-            <XAxis dataKey="date" hide={false} interval={'preserveStart'} 
-              tickFormatter={x => DayJS(x).format('YYYY/MM')} style={{ fontFamily: 'Open Sans', fontSize: 9 }} />
-            <ReferenceLine y={0} yAxisId="yInstallsGrowth" stroke="#ffdc9d" strokeWidth={2} />
+              fill={`url(#downloadsGradient-${data.slug})`}
+              radius={[4, 4, 0, 0]}
+              strokeWidth={0} isAnimationActive={false} />
+            <Line dataKey="installsGrowth" yAxisId="yInstallsGrowth"
+              stroke={`url(#installsGradient-${data.slug})`}
+              strokeWidth={3} dot={false} />
+            <XAxis dataKey="date" hide={false} interval={'preserveStart'}
+              tickFormatter={x => DayJS(x).format('MMM')}
+              tick={{ fontSize: 10, fill: 'var(--gray)' }}
+              axisLine={{ stroke: 'var(--gray)', strokeOpacity: 0.2 }}
+              tickLine={false} />
+            <ReferenceLine y={0} yAxisId="yInstallsGrowth"
+              stroke="var(--gray)" strokeOpacity={0.3} strokeDasharray="3 3" />
             <YAxis dataKey="downloads" yAxisId="yDownloads" hide={true} />
             <YAxis dataKey="installsGrowth" yAxisId="yInstallsGrowth" hide={true} />
-            <Tooltip labelFormatter={x => DayJS(x).format('MMMM YYYY')} formatter={(value, name, props) => { 
-              if (name === 'installsGrowth') {
-                if (value.toFixed) {
-                  return [value.toFixed(2) + '%', "Installs Growth"]; 
+            <Tooltip
+              labelFormatter={x => DayJS(x).format('MMMM YYYY')}
+              contentStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                border: '1px solid var(--gray)',
+                borderRadius: '8px',
+                fontSize: '12px'
+              }}
+              formatter={(value, name, props) => {
+                if (name === 'installsGrowth') {
+                  if (value && value.toFixed) {
+                    const color = value >= 0 ? 'var(--green)' : 'var(--red)';
+                    return [
+                      <span style={{ color }}>{value >= 0 ? '+' : ''}{value.toFixed(2)}%</span>,
+                      "Growth"
+                    ];
+                  }
                 }
-              }
-              return [numberWithCommas(value), "Downloads"]; 
-            }} />
+                return [numberWithCommas(value), "Downloads"];
+              }} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

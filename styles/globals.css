@@ -1,20 +1,20 @@
 :root {
-  --blue: #507ebb;
+  --blue: #667eea;
   --indigo: #727cf5;
-  --purple: #6b5eae;
+  --purple: #764ba2;
   --pink: #ff679b;
-  --red: #ea5747;
-  --orange: orange;
-  --yellow: #f5803e;
-  --green: rgb(66, 165, 51);
+  --red: #f86b7e;
+  --orange: #f8a96b;
+  --yellow: #f5d03e;
+  --green: #43c39a;
   --teal: #02a8b5;
   --cyan: #27bcfd;
   --white: #fff;
   --gray: #748194;
   --gray-dark: #4d5969;
-  --primary: #2c7be5;
+  --primary: #667eea;
   --secondary: #748194;
-  --success: #00d27a;
+  --success: #43c39a;
   --info: #27bcfd;
   --light: #f9fafd;
   --dark: #0b1727;
@@ -26,7 +26,7 @@
 
 body {
   padding: 0;
-  margin: 40px;
+  margin: 0;
   font-size: 12px;
   background-color: #edf2f9;
   font-family: "Open Sans";
@@ -51,6 +51,58 @@ p {
   color: var(--gray);
 }
 
+/* Header Styles */
+.header {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 40px -10px rgba(102, 126, 234, 0.4);
+}
+
+.headerContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  font-family: monospace;
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 12px 0;
+}
+
+.subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.versionBadge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.separator {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+}
+
+.pluginCount {
+  font-weight: 400;
+}
+
 ul {
   margin: 0;
   padding: 0;
@@ -63,7 +115,9 @@ li {
 }
 
 .page {
-  margin-top: 80px;
+  padding: 0 40px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat( auto-fit, minmax(580px, 1fr) );
 }

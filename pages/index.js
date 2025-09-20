@@ -12,18 +12,59 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 const ONE_WEEK = ONE_DAY * 7;
 
 export default function Home(props) {
-  const { plugins = [], wpVersion } = props;
+  const { plugins = [], wpVersion, siteName = 'Dash My Plugins' } = props;
+
+  // Calculate overall health
+  const totalScore = plugins.reduce((sum, plugin) => sum + plugin.slackScore, 0);
+  const maxPossibleScore = plugins.length * 8; // 4 metrics × 2 max points each
+  const healthPercentage = plugins.length > 0 ? Math.round((1 - totalScore / maxPossibleScore) * 100) : 100;
+
+  const getHealthLabel = (percentage) => {
+    if (percentage >= 90) return 'Excellent';
+    if (percentage >= 75) return 'Good';
+    if (percentage >= 60) return 'Fair';
+    return 'Needs Attention';
+  };
+
+  const getHealthColor = (percentage) => {
+    if (percentage >= 90) return 'var(--green)';
+    if (percentage >= 75) return 'var(--blue)';
+    if (percentage >= 60) return 'var(--orange)';
+    return 'var(--red)';
+  };
 
   return (
     <>
       <Head>
-        <title>Dash My Plugins</title>
+        <title>{siteName}</title>
         <meta name="description" content="Dashboard for WP Plugin Developers" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1>Dash My Plugins</h1>
-      <p>The latest version of WordPress is {wpVersion}.</p>
+      <header className="header">
+        <div className="headerContent">
+          <h1 className="title">{siteName}</h1>
+          <div className="subtitle">
+            <span className="versionBadge">WordPress {wpVersion}</span>
+            <span className="separator">•</span>
+            <span className="pluginCount">{plugins.length} plugins</span>
+            <span className="separator">•</span>
+            <span className="healthIndicator">
+              <style jsx>{`
+                .healthIndicator {
+                  background: ${getHealthColor(healthPercentage)};
+                  padding: 6px 14px;
+                  border-radius: 20px;
+                  font-weight: 500;
+                  color: white;
+                  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                }
+              `}</style>
+              Health: {healthPercentage}%
+            </span>
+          </div>
+        </div>
+      </header>
 
       <main className="page">
         {plugins.map((x) => <PluginCard key={x.slug} data={x} wpVersion={wpVersion} />)}
@@ -41,6 +82,7 @@ export async function getStaticProps() {
   let cfgPlugins = pluginsEnv ? pluginsEnv.split(',') : [];
   let plugins = [];
   const wpVersion = await fetchWordPressVersion();
+  const siteName = process.env.SITE_NAME || 'Dash My Plugins';
   for (let cfgPlugin of cfgPlugins) {
     const data = await fetchPluginInfo(cfgPlugin.trim());
     const downloads = await fetchDownloadsStats(cfgPlugin);
@@ -116,5 +158,5 @@ export async function getStaticProps() {
     }
   }
   plugins.sort((a, b) => (a.slackScore > b.slackScore) ? -1 : 1);
-  return { props: { plugins, wpVersion }, revalidate: 60 * 1 }
+  return { props: { plugins, wpVersion, siteName }, revalidate: 60 * 1 }
 }
