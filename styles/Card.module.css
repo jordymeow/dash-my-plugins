@@ -9,6 +9,20 @@
   margin-right: 20px;
   padding: 20px;
   position: relative;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.cardWarning {
+  composes: card;
+  border-color: var(--orange);
+  box-shadow: 0 7px 14px 0 rgb(255 165 0 / 15%), 0 3px 6px 0 rgb(255 165 0 / 10%);
+}
+
+.cardCritical {
+  composes: card;
+  border-color: var(--red);
+  box-shadow: 0 7px 14px 0 rgb(255 0 0 / 15%), 0 3px 6px 0 rgb(255 0 0 / 10%);
 }
 
 .banner {

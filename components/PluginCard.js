@@ -4,7 +4,6 @@ import { Icon } from '@iconify/react';
 import alertIcon from '@iconify/icons-mdi/alert';
 import alertOctagon from '@iconify/icons-mdi/alert-octagon';
 import accountCircle from '@iconify/icons-mdi/account-circle';
-import closeCircle from '@iconify/icons-mdi/bomb';
 import { ResponsiveContainer, ReferenceLine, ComposedChart, Bar, Line, XAxis, YAxis, Tooltip } from 'recharts';
 
 import css from '../styles/Card.module.css'
@@ -36,15 +35,16 @@ const PluginCard = ({ data, wpVersion }) => {
 
   //console.log(data.banners.high);
 
-  return (<div key={data.slug} className={css.card}>
+  // Add status class based on slack score
+  const cardStatusClass = data.slackScore >= 6 ? css.cardCritical :
+                          data.slackScore >= 2 ? css.cardWarning :
+                          css.card;
+
+  return (<div key={data.slug} className={cardStatusClass}>
     <div className={css.banner}><Image src={data.banners.high} alt={data.slug} width={280} height={240} /></div>
     <a className={css.cardTitle} title={`Slack Score: ${data.slackScore}`} 
       href={`https://wordpress.org/plugins/${data.slug}/`} rel="noreferrer" target="_blank">
       <h2>
-        {data.slackScore >= 6 && <Icon icon={closeCircle} width={19}
-          style={{ position: 'relative', top: 3, marginRight: 5 }} color={'var(--red)'} />}
-        {(data.slackScore >= 2 && data.slackScore < 6) && <Icon icon={closeCircle} width={19}
-          style={{ position: 'relative', top: 3, marginRight: 5 }} color={'var(--orange)'} />}
         {data.name}
       </h2>
       <small>
