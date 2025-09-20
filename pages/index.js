@@ -36,7 +36,9 @@ export default function Home(props) {
 export async function getStaticProps() {
   //const hubs = await loadHubs();
   //const blogPosts = await loadBlogPosts();
-  let cfgPlugins = process.env.PLUGINS.split(',');
+  // Fallback to empty array if PLUGINS is not defined (during build)
+  const pluginsEnv = process.env.PLUGINS || '';
+  let cfgPlugins = pluginsEnv ? pluginsEnv.split(',') : [];
   let plugins = [];
   const wpVersion = await fetchWordPressVersion();
   for (let cfgPlugin of cfgPlugins) {
