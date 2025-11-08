@@ -103,20 +103,11 @@ export default async function handler(req, res) {
     };
   }
 
-  // Test active installs
-  try {
-    const aiData = await fetchWithHttps(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${testSlug}&limit=10`);
-    results.tests.activeInstalls = {
-      success: true,
-      dataPoints: Object.keys(aiData).length
-    };
-  } catch (err) {
-    results.tests.activeInstalls = {
-      success: false,
-      error: err.message,
-      stack: err.stack
-    };
-  }
+  // Test active installs (note: historical data not available from WordPress.org API)
+  results.tests.activeInstalls = {
+    success: true,
+    note: 'Historical active install data not available - only current count from plugin info'
+  };
 
   res.status(200).json(results);
 }

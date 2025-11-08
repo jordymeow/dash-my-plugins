@@ -89,18 +89,10 @@ const fetchPluginInfo = async (slug) => {
 }
 
 const fetchActiveStats = async (slug) => {
-  try {
-    const json = await fetchWithHttps(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
-    let chartsInstallsData = [];
-    for (const date of Object.keys(json))
-      chartsInstallsData.push({ date: new Date(date), value: json[date] });
-    chartsInstallsData = dataAggregateForInstalls(chartsInstallsData);
-    return chartsInstallsData;
-  }
-  catch (err) {
-    console.error(`Failed to fetch active stats for ${slug}:`, err.message);
-    return null;
-  }
+  // Note: WordPress.org API does not provide historical active install data
+  // Only current active_installs count is available from plugin info endpoint
+  // Returning null to indicate no historical data available
+  return null;
 }
 
 const fetchDownloadsStats = async (slug) => {
