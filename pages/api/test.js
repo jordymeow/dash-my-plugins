@@ -1,4 +1,44 @@
+import https from 'https';
+
 const WP_API = 'https://api.wordpress.org';
+
+// Use native https module instead of fetch (works better in Alpine Docker)
+const fetchWithHttps = (url) => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Request timeout after 30s'));
+    }, 30000);
+
+    https.get(url, {
+      headers: {
+        'User-Agent': 'dash-my-plugins/1.0'
+      },
+      timeout: 30000
+    }, (res) => {
+      clearTimeout(timeout);
+
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          resolve(json);
+        } catch (err) {
+          reject(new Error('Failed to parse JSON: ' + err.message));
+        }
+      });
+    }).on('error', (err) => {
+      clearTimeout(timeout);
+      reject(err);
+    }).on('timeout', () => {
+      clearTimeout(timeout);
+      reject(new Error('Request timeout'));
+    });
+  });
+};
 
 export default async function handler(req, res) {
   const testSlug = req.query.slug || 'media-cleaner';
@@ -14,12 +54,10 @@ export default async function handler(req, res) {
 
   // Test WordPress version
   try {
-    const wpRes = await fetch(`${WP_API}/core/version-check/1.7/`);
-    const wpData = await wpRes.json();
+    const wpData = await fetchWithHttps(`${WP_API}/core/version-check/1.7/`);
     results.tests.wordpressVersion = {
       success: true,
-      version: wpData.offers?.[0]?.version || 'Unknown',
-      status: wpRes.status
+      version: wpData.offers?.[0]?.version || 'Unknown'
     };
   } catch (err) {
     results.tests.wordpressVersion = {
@@ -32,14 +70,12 @@ export default async function handler(req, res) {
 
   // Test plugin info
   try {
-    const pluginRes = await fetch(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${testSlug}`);
-    const pluginData = await pluginRes.json();
+    const pluginData = await fetchWithHttps(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${testSlug}`);
     results.tests.pluginInfo = {
       success: true,
       slug: pluginData.slug,
       name: pluginData.name,
-      version: pluginData.version,
-      status: pluginRes.status
+      version: pluginData.version
     };
   } catch (err) {
     results.tests.pluginInfo = {
@@ -53,12 +89,10 @@ export default async function handler(req, res) {
 
   // Test downloads stats
   try {
-    const dlRes = await fetch(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${testSlug}&limit=10`);
-    const dlData = await dlRes.json();
+    const dlData = await fetchWithHttps(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${testSlug}&limit=10`);
     results.tests.downloadStats = {
       success: true,
-      dataPoints: Object.keys(dlData).length,
-      status: dlRes.status
+      dataPoints: Object.keys(dlData).length
     };
   } catch (err) {
     results.tests.downloadStats = {
@@ -70,12 +104,10 @@ export default async function handler(req, res) {
 
   // Test active installs
   try {
-    const aiRes = await fetch(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${testSlug}&limit=10`);
-    const aiData = await aiRes.json();
+    const aiData = await fetchWithHttps(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${testSlug}&limit=10`);
     results.tests.activeInstalls = {
       success: true,
-      dataPoints: Object.keys(aiData).length,
-      status: aiRes.status
+      dataPoints: Object.keys(aiData).length
     };
   } catch (err) {
     results.tests.activeInstalls = {

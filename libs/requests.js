@@ -1,25 +1,44 @@
 import DayJS from 'dayjs';
+import https from 'https';
 
 const WP_API = 'https://api.wordpress.org';
 
-// Custom fetch with timeout to handle slow/IPv6 connections
-const fetchWithTimeout = async (url, timeout = 30000) => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+// Reliable fetch using Node.js https module (works better in Alpine Docker than fetch/undici)
+const fetchWithHttps = (url) => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Request timeout after 30s'));
+    }, 30000);
 
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
+    https.get(url, {
       headers: {
         'User-Agent': 'dash-my-plugins/1.0'
-      }
+      },
+      timeout: 30000
+    }, (res) => {
+      clearTimeout(timeout);
+
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          resolve(json);
+        } catch (err) {
+          reject(new Error('Failed to parse JSON: ' + err.message));
+        }
+      });
+    }).on('error', (err) => {
+      clearTimeout(timeout);
+      reject(err);
+    }).on('timeout', () => {
+      clearTimeout(timeout);
+      reject(new Error('Request timeout'));
     });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (err) {
-    clearTimeout(timeoutId);
-    throw err;
-  }
+  });
 };
 
 // https://api.wordpress.org/stats/plugin/1.0/downloads.php?slug={media-cleaner}
@@ -59,8 +78,7 @@ const dataAggregateForInstalls = (data, aggregateBy = 'month') => {
 
 const fetchPluginInfo = async (slug) => {
   try {
-    const res = await fetchWithTimeout(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${slug}`);
-    const json = await res.json();
+    const json = await fetchWithHttps(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${slug}`);
     return json;
   }
   catch (err) {
@@ -71,8 +89,7 @@ const fetchPluginInfo = async (slug) => {
 
 const fetchActiveStats = async (slug) => {
   try {
-    const res = await fetchWithTimeout(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
-    const json = await res.json();
+    const json = await fetchWithHttps(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
     let chartsInstallsData = [];
     for (const date of Object.keys(json))
       chartsInstallsData.push({ date: new Date(date), value: json[date] });
@@ -87,8 +104,7 @@ const fetchActiveStats = async (slug) => {
 
 const fetchDownloadsStats = async (slug) => {
   try {
-    const res = await fetchWithTimeout(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
-    const json = await res.json();
+    const json = await fetchWithHttps(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
     let chartsDownloadsData = [];
     for (const date of Object.keys(json))
       chartsDownloadsData.push({ date: new Date(date), value: parseInt(json[date]) });
@@ -103,8 +119,7 @@ const fetchDownloadsStats = async (slug) => {
 
 const fetchWordPressVersion = async () => {
   try {
-    const res = await fetchWithTimeout(`${WP_API}/core/version-check/1.7/`);
-    const data = await res.json();
+    const data = await fetchWithHttps(`${WP_API}/core/version-check/1.7/`);
     // The latest version is in the first offer
     if (data.offers && data.offers.length > 0) {
       return data.offers[0].version;
