@@ -79,15 +79,19 @@ const fetchDownloadsStats = async (slug) => {
 }
 
 const fetchWordPressVersion = async () => {
-  const res = await fetch(`${WP_API}/core/stable-check/1.0/`);
-  const data = await res.json();
-  const versions = Object.keys(data);
-  for (let version of versions) {
-    if (data[version] === 'latest') {
-      return version;
+  try {
+    const res = await fetch(`${WP_API}/core/version-check/1.7/`);
+    const data = await res.json();
+    // The latest version is in the first offer
+    if (data.offers && data.offers.length > 0) {
+      return data.offers[0].version;
     }
+    return null;
   }
-  return null;
+  catch (err) {
+    console.warn('Failed to fetch WordPress version, using fallback');
+    return 'Unknown';
+  }
 }
 
 export { fetchPluginInfo, fetchWordPressVersion, fetchActiveStats, fetchDownloadsStats };
