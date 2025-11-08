@@ -15,6 +15,12 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
+# Accept build arguments and set as environment variables for build
+ARG PLUGINS
+ARG SITE_NAME
+ENV PLUGINS=${PLUGINS}
+ENV SITE_NAME=${SITE_NAME}
+
 # Build the application
 RUN pnpm build
 
