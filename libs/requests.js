@@ -11,6 +11,7 @@ const fetchWithHttps = (url) => {
     }, 30000);
 
     https.get(url, {
+      family: 4, // Force IPv4 only
       headers: {
         'User-Agent': 'dash-my-plugins/1.0'
       },
