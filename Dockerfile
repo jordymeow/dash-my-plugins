@@ -27,6 +27,9 @@ RUN pnpm build
 # Runtime stage
 FROM node:20-alpine AS runner
 
+# Install ca-certificates for HTTPS requests
+RUN apk add --no-cache ca-certificates
+
 # Install pnpm for runtime
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
