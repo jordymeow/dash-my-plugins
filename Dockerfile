@@ -30,6 +30,9 @@ FROM node:20-alpine AS runner
 # Install ca-certificates for HTTPS requests
 RUN apk add --no-cache ca-certificates
 
+# Configure DNS to prefer IPv4 (fixes Node.js fetch timeouts)
+RUN echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf
+
 # Install pnpm for runtime
 RUN corepack enable && corepack prepare pnpm@latest --activate
 

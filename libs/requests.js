@@ -2,6 +2,26 @@ import DayJS from 'dayjs';
 
 const WP_API = 'https://api.wordpress.org';
 
+// Custom fetch with timeout to handle slow/IPv6 connections
+const fetchWithTimeout = async (url, timeout = 30000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'dash-my-plugins/1.0'
+      }
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+};
+
 // https://api.wordpress.org/stats/plugin/1.0/downloads.php?slug={media-cleaner}
 
 const dataAggregateForDownloads = (data, aggregateBy = 'month') => {
@@ -39,18 +59,19 @@ const dataAggregateForInstalls = (data, aggregateBy = 'month') => {
 
 const fetchPluginInfo = async (slug) => {
   try {
-    const res = await fetch(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${slug}`);
+    const res = await fetchWithTimeout(`${WP_API}/plugins/info/1.2/?action=plugin_information&request[slug]=${slug}`);
     const json = await res.json();
     return json;
   }
   catch (err) {
+    console.error(`Failed to fetch plugin info for ${slug}:`, err.message);
     return null;
   }
 }
 
 const fetchActiveStats = async (slug) => {
   try {
-    const res = await fetch(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
+    const res = await fetchWithTimeout(`${WP_API}/stats/plugin/1.0/active-installs.php?slug=${slug}&limit=730`);
     const json = await res.json();
     let chartsInstallsData = [];
     for (const date of Object.keys(json))
@@ -59,13 +80,14 @@ const fetchActiveStats = async (slug) => {
     return chartsInstallsData;
   }
   catch (err) {
+    console.error(`Failed to fetch active stats for ${slug}:`, err.message);
     return null;
   }
 }
 
 const fetchDownloadsStats = async (slug) => {
   try {
-    const res = await fetch(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
+    const res = await fetchWithTimeout(`${WP_API}/stats/plugin/1.0/downloads.php?slug=${slug}&limit=730`);
     const json = await res.json();
     let chartsDownloadsData = [];
     for (const date of Object.keys(json))
@@ -74,13 +96,14 @@ const fetchDownloadsStats = async (slug) => {
     return chartsDownloadsData;
   }
   catch (err) {
+    console.error(`Failed to fetch download stats for ${slug}:`, err.message);
     return null;
   }
 }
 
 const fetchWordPressVersion = async () => {
   try {
-    const res = await fetch(`${WP_API}/core/version-check/1.7/`);
+    const res = await fetchWithTimeout(`${WP_API}/core/version-check/1.7/`);
     const data = await res.json();
     // The latest version is in the first offer
     if (data.offers && data.offers.length > 0) {
@@ -89,7 +112,7 @@ const fetchWordPressVersion = async () => {
     return null;
   }
   catch (err) {
-    console.warn('Failed to fetch WordPress version, using fallback');
+    console.warn('Failed to fetch WordPress version, using fallback:', err.message);
     return 'Unknown';
   }
 }
