@@ -25,6 +25,7 @@ export default async function handler(req, res) {
     results.tests.wordpressVersion = {
       success: false,
       error: err.message,
+      cause: err.cause?.message || err.cause?.code || 'Unknown',
       stack: err.stack
     };
   }
@@ -44,6 +45,8 @@ export default async function handler(req, res) {
     results.tests.pluginInfo = {
       success: false,
       error: err.message,
+      cause: err.cause?.message || err.cause?.code || 'Unknown',
+      causeDetails: err.cause,
       stack: err.stack
     };
   }
