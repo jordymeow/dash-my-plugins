@@ -1,16 +1,16 @@
 # Build stage
 FROM node:20-alpine AS builder
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Pin the package manager used by both stages for repeatable deployments.
+RUN corepack enable && corepack prepare pnpm@12.9.1 --activate
 
 WORKDIR /app
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Approve only the locked resolver's native-binding check used by ESLint.
+RUN pnpm install --frozen-lockfile --allow-build=unrs-resolver@1.11.1
 
 # Copy source code
 COPY . .
@@ -34,7 +34,7 @@ RUN apk add --no-cache ca-certificates
 RUN echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf
 
 # Install pnpm for runtime
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@12.9.1 --activate
 
 WORKDIR /app
 
