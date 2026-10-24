@@ -54,6 +54,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./
 
+# The application keeps its last complete upstream snapshot across restarts.
+RUN mkdir -p /app/.cache && chown nextjs:nodejs /app/.cache
+
 # Switch to non-root user
 USER nextjs
 

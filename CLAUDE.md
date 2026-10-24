@@ -26,34 +26,24 @@ This is a **Next.js 13 static site** that displays WordPress plugin statistics w
 
 ### Key Components
 
-- **Pages**: Static site generation using `getStaticProps`
-  - `pages/index.js` - Main dashboard displaying all plugins
-  - `pages/_app.js`, `pages/_document.js` - Next.js app configuration
+- `pages/index.js`: compact desktop card board and browser-local release policy; no filters or CSV.
+- `components/HealthCard.js`: release age, prominent open-thread count, priority action, and download trend.
+- `components/BaselineChart.js`: raw download bars with visually capped peaks, descriptive quiet-day line, and release markers in details.
+- `components/PluginDetail.js`: full assessment and uncapped raw download history.
+- `libs/dashboard.js`: bounded API loading, caching, and serializable dashboard snapshots.
+- `libs/snapshot-cache.mjs`: 15-minute memory/disk cache, deduplication, and stale recovery.
+- `libs/requests.js`: native HTTPS requests with timeout cleanup and one retry.
+- `libs/health.mjs`: release policy, observed quiet-day descriptions, and a separate release-aware matched comparison for alerts.
+- `libs/metrics.mjs`: date parsing, download windows, chart aggregation, and formatting.
+- `pages/api/dashboard.js`: refresh endpoint; failed refreshes preserve the previous UI snapshot.
+- `styles/globals.css`: responsive board and dialog styling.
 
-- **Data Fetching**: `libs/requests.js`
-  - Fetches plugin info, download stats, and active installations from WordPress.org API
-  - Aggregates data by month for charts
-  - All API calls go through `https://api.wordpress.org`
+### Data accuracy
 
-- **Components**:
-  - `components/PluginCard.js` - Displays individual plugin statistics
+Downloads include updates, not just new installs. Active installs are rounded lower
+bounds and can overlap across plugins. Support is unresolved topics within the API's
+reporting window, not necessarily unanswered requests. Missing data must remain
+unknown, never zero. Do not invent historical active-install data or release dates.
 
-- **Styling**: CSS Modules in `styles/` directory
-  - `Card.module.css` - Plugin card styling
-  - `globals.css` - Global styles
-
-### Data Flow
-
-1. Plugin slugs are read from `PLUGINS` environment variable in `.env.local`
-2. At build time, `getStaticProps` fetches data for each plugin from WordPress.org API
-3. Data includes: version info, ratings, download stats, active installs, support threads
-4. Charts use Recharts library for data visualization
-5. Dates are handled with DayJS library
-
-### WordPress.org API Integration
-
-The app fetches:
-- Plugin metadata: `/plugins/info/1.2/`
-- Download statistics: `/stats/plugin/1.0/downloads.php`
-- Active installation history: `/stats/plugin/1.0/active-installs.php`
-- Latest WordPress version: `/core/version-check/1.7/`
+See README.md for the trend method and its limits. Run
+`node --test tests/*.test.mjs` when changing calculations.
