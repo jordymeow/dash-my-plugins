@@ -71,5 +71,5 @@ ENV PORT=3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); })"
 
-# Start the application
-CMD ["pnpm", "start"]
+# Start the built application directly; no package downloads or installs at runtime.
+CMD ["node", "node_modules/next/dist/bin/next", "start"]
