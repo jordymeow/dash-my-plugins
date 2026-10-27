@@ -31,7 +31,7 @@ async function loadPlugin(slug) {
     lastUpdated: currentRelease ? `${currentRelease.date}T00:00:00Z` : parseWordPressDate(data.last_updated),
     releaseDateSource: currentRelease ? 'changelog' : 'metadata',
     releases,
-    downloads: downloads ? Object.fromEntries(downloads.slice(-365).map(({ date, value }) => [date, value])) : null,
+    downloads: downloads ? Object.fromEntries(downloads.slice(-730).map(({ date, value }) => [date, value])) : null,
   };
 }
 
@@ -50,7 +50,7 @@ async function loadDashboard() {
   return snapshot;
 }
 
-const cacheKey = createHash('sha256').update(`v4:${process.env.PLUGINS}:${process.env.SITE_NAME}`).digest('hex').slice(0, 16);
+const cacheKey = createHash('sha256').update(`v5:${process.env.PLUGINS}:${process.env.SITE_NAME}`).digest('hex').slice(0, 16);
 const cacheFile = path.join(process.env.DASH_CACHE_DIR || path.join(process.cwd(), '.cache'), `dashboard-${cacheKey}.json`);
 const getCached = createSnapshotCache({
   load: loadDashboard,

@@ -91,9 +91,6 @@ svg { flex-shrink:0; vertical-align:middle; }
 .action-urgent { color:#a74b39; font-weight:600; }
 .release-soon .card-next-action { color:#99611a; font-weight:600; }
 .release-overdue .card-next-action { color:#b3472b; font-weight:650; }
-.adjusted-comparison { border-top:1px solid #dcdfea; padding-top:16px; margin-top:18px; font-size:14px; }
-.adjusted-comparison summary { cursor:pointer; color:#53657d; font-weight:550; }
-.adjusted-comparison summary span { float:right; color:#7d8998; font-size:12px; font-weight:400; }
 .board-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:10px; color:#83918e; margin-top:9px; line-height:1.5; }
 .board-footer > span:first-child { display:flex; gap:6px; align-items:center; }
 .board-footer i { width:8px; height:8px; border-radius:3px; display:inline-block; }

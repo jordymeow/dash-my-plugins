@@ -27,13 +27,13 @@ This is a **Next.js 13 static site** that displays WordPress plugin statistics w
 ### Key Components
 
 - `pages/index.js`: compact desktop card board and browser-local release policy; no filters or CSV.
-- `components/HealthCard.js`: release age, prominent open-thread count, priority action, and download trend.
-- `components/BaselineChart.js`: raw download bars with visually capped peaks, descriptive quiet-day line, and release markers in details.
+- `components/HealthCard.js`: release age, prominent open-thread count, priority action, and change vs. last year.
+- `components/BaselineChart.js`: quiet floor per 4-week block, last year (solid) over the year before (dashed).
 - `components/PluginDetail.js`: full assessment and uncapped raw download history.
 - `libs/dashboard.js`: bounded API loading, caching, and serializable dashboard snapshots.
 - `libs/snapshot-cache.mjs`: 15-minute memory/disk cache, deduplication, and stale recovery.
 - `libs/requests.js`: native HTTPS requests with timeout cleanup and one retry.
-- `libs/health.mjs`: release policy, observed quiet-day descriptions, and a separate release-aware matched comparison for alerts.
+- `libs/health.mjs`: release policy, and the year-over-year quiet-floor trend with its portfolio median.
 - `libs/metrics.mjs`: date parsing, download windows, chart aggregation, and formatting.
 - `pages/api/dashboard.js`: refresh endpoint; failed refreshes preserve the previous UI snapshot.
 - `styles/globals.css`: responsive board and dialog styling.
